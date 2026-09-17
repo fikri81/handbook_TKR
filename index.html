@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESP AUTOMOTIVE HANDBOOK - SMKN Wongsorejo | Racing Edition</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Oswald:wght@600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: #0f0f0f; background-image: radial-gradient(circle at 1px 1px, #222 1px, transparent 0); background-size: 20px 20px; }
+   .font-racing { font-family: 'Oswald', sans-serif; }
+   .card-hover:hover { transform: translateY(-4px) scale(1.01); box-shadow: 0 20px 25px -5px rgba(251,146,60,0.3); }
+  </style>
+</head>
+<body class="text-slate-200 min-h-screen flex flex-col">
+  <div class="h-1.5 w-full bg-gradient-to-r from-amber-500 via-orange-500 to-red-600"></div>
+  <header class="bg-black/90 backdrop-blur text-white shadow-2xl sticky top-0 z-50 border-b border-amber-500/30">
+    <div class="max-w-7xl mx-auto px-4 py-3">
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="flex items-center space-x-4">
+          <div class="relative">
+            <div class="absolute -inset-1 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl blur opacity-40"></div>
+            <img src="https://cdn.jsdelivr.net/gh/fikri81/handbook_TKR@main/logob.png" alt="Logo" class="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-contain bg-white p-1.5 shadow-xl border-2 border-amber-500/50">
+          </div>
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-black tracking-tight font-racing uppercase italic">ESP <span class="text-amber-500">AUTOMOTIVE</span> HANDBOOK</h1>
+            <p class="text-xs sm:text-sm text-amber-400 font-semibold tracking-widest uppercase"><i class="fa-solid fa-flag-checkered mr-2"></i>Vocational English Dictionary • TKRO Class 10 • Racing Edition</p>
+          </div>
+        </div>
+        <div class="relative w-full sm:w-96">
+          <input type="text" id="searchInput" onkeyup="filterData()" placeholder="SEARCH PARTS..." class="w-full bg-zinc-900 text-white text-sm pl-12 pr-4 py-3.5 rounded-xl border-2 border-zinc-800 focus:outline-none focus:border-amber-500 transition font-semibold uppercase">
+          <i class="fa-solid fa-magnifying-glass absolute left-4 top-4 text-amber-500"></i>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="bg-zinc-900 border-b-2 border-amber-500/20 sticky top-[88px] z-40">
+    <div class="max-w-7xl mx-auto px-4 py-3">
+      <div class="flex items-center space-x-2 overflow-x-auto scrollbar-none" id="categoryFilters"></div>
+    </div>
+  </div>
+  <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
+    <div class="flex justify-between items-center mb-8">
+      <h2 class="text-sm font-black text-white uppercase tracking-widest font-racing" id="resultsCount">Loading garage...</h2>
+      <div class="text-xs text-zinc-400 bg-zinc-900 px-3 py-2 rounded-full border border-zinc-800"><i class="fa-solid fa-volume-high text-amber-500 mr-2"></i>Tap speaker for pronunciation</div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="dictionaryGrid"></div>
+    <div id="emptyState" class="hidden text-center py-20 bg-zinc-900 rounded-2xl border-2 border-dashed border-zinc-700">
+      <i class="fa-solid fa-screwdriver-wrench text-6xl text-zinc-600 mb-4"></i>
+      <h3 class="text-xl font-black text-white uppercase font-racing">Part Not Found In Garage</h3>
+    </div>
+  </main>
+  <footer class="bg-black text-zinc-400 text-xs py-8 border-t-4 border-amber-500">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <p class="font-black text-white uppercase tracking-widest font-racing text-sm"><i class="fa-solid fa-wrench text-amber-500 mr-2"></i>ESP AUTOMOTIVE • SMKN Wongsorejo • Racing Edition</p>
+      <p class="text-zinc-500 mt-1">Repo: fikri81/handbook_TKR | CDN Permanent | Logo: logob.png enlarged</p>
+    </div>
+  </footer>
+<script>
+const CDN = "https://cdn.jsdelivr.net/gh/fikri81/handbook_TKR@main/";
+const automotiveData = [
+{ id: 1, term: "Combination Wrench", phonetics: "/ˌkɒmbɪˈneɪʃn rentʃ/", category: "tools", indonesian: "Kunci Pas-Ring", function: "Used to tighten or loosen bolts and nuts with dual ends.", image: CDN + "combination_wrench.jpg" },
+{ id: 2, term: "Socket Wrench", phonetics: "/ˈsɒkɪt rentʃ/", category: "tools", indonesian: "Kunci Sok", function: "Used to loosen or tighten heavy-duty bolts using interchangeable sockets.", image: CDN + "socket_wrench.jpg" },
+{ id: 3, term: "Torque Wrench", phonetics: "/tɔːk rentʃ/", category: "tools", indonesian: "Kunci Momen / Torsi", function: "Used to apply a specific torque value to fasteners like cylinder bolts.", image: CDN + "torque_wrench.jpg" },
+{ id: 4, term: "Vernier Caliper", phonetics: "/ˈvɜːniə ˈkælɪpə/", category: "tools", indonesian: "Jangka Sorong", function: "Used to measure internal, external dimensions and depth accurately.", image: CDN + "vernier_caliper.jpg" },
+{ id: 5, term: "Micrometer", phonetics: "/maɪˈkrɒmɪtə/", category: "tools", indonesian: "Mikrometer Sekrup", function: "Used for precise measurement of thickness or component diameter.", image: CDN + "micrometer.jpg" },
+{ id: 6, term: "Feeler Gauge", phonetics: "/ˈfiːlə ɡeɪdʒ/", category: "tools", indonesian: "Fuler / Alat Ukur Celah", function: "Used to measure small clearance gaps, such as valve clearances.", image: CDN + "feeler_gauge.jpg" },
+{ id: 7, term: "Impact Wrench", phonetics: "/ˈɪmpækt rentʃ/", category: "tools", indonesian: "Kunci Impact Pneumatik", function: "Used to remove tight lug nuts rapidly using compressed air power.", image: CDN + "impact_wrench.jpg" },
+{ id: 8, term: "Multimeter / Avometer", phonetics: "/ˈmʌlti-miːtə/", category: "tools", indonesian: "Multitester / Avometer", function: "Used to measure voltage, electrical current, and resistance.", image: CDN + "multimeter.jpg" },
+{ id: 9, term: "Hydraulic Jack", phonetics: "/haɪˈdrɔːlɪk dʒæk/", category: "tools", indonesian: "Dongkrak Hidrolik", function: "Used to lift heavy vehicles up off the ground.", image: CDN + "hydraulic_jack.jpg" },
+{ id: 10, term: "Jack Stand", phonetics: "/dʒæk stænd/", category: "tools", indonesian: "Stand Penyangga Mobil", function: "Used to support the vehicle safely after being lifted by a jack.", image: CDN + "jackstand.jpg" },
+{ id: 11, term: "Cylinder Block", phonetics: "/ˈsɪlɪndə blɒk/", category: "engine", indonesian: "Blok Silinder", function: "Main structure housing cylinders, pistons, and oil passages.", image: CDN + "cylinder_block.jpg" },
+{ id: 12, term: "Cylinder Head", phonetics: "/ˈsɪlɪndə hed/", category: "engine", indonesian: "Kepala Silinder", function: "Covers top of cylinder, houses valves, spark plugs, and combustion chamber.", image: CDN + "cylinder_head.jpg" },
+{ id: 13, term: "Piston", phonetics: "/ˈpɪstən/", category: "engine", indonesian: "Piston / Torak", function: "Transfers force from combustion to the connecting rod.", image: CDN + "piston.jpg" },
+{ id: 14, term: "Connecting Rod", phonetics: "/kəˈnektɪŋ rɒd/", category: "engine", indonesian: "Stang Piston / Batang Torak", function: "Connects the piston to the crankshaft to transfer motion.", image: CDN + "connecting_rod.jpg" },
+{ id: 15, term: "Crankshaft", phonetics: "/ˈkræŋkʃɑːft/", category: "engine", indonesian: "Poros Engkol / Kruk As", function: "Converts linear piston movement into rotary motion.", image: CDN + "crankshaft.jpg" },
+{ id: 16, term: "Camshaft", phonetics: "/ˈkæmʃɑːft/", category: "engine", indonesian: "Noken As / Poros Nok", function: "Controls opening and closing timing of intake and exhaust valves.", image: CDN + "camshaft.jpg" },
+{ id: 17, term: "Intake Valve", phonetics: "/ˈɪnteɪk vælv/", category: "engine", indonesian: "Katup Masuk (In)", function: "Allows air-fuel mixture or fresh air to enter the combustion chamber.", image: CDN + "intake_valve.jpg" },
+{ id: 18, term: "Exhaust Valve", phonetics: "/ɪɡˈzɔːst vælv/", category: "engine", indonesian: "Katup Buang (Ex)", function: "Allows burned exhaust gases to exit the combustion chamber.", image: CDN + "exhaust_valve.jpg" },
+{ id: 19, term: "Timing Belt / Chain", phonetics: "/ˈtaɪmɪŋ belt/", category: "engine", indonesian: "Timing Belt / Rantai Timing", function: "Synchronizes the rotation of crankshaft and camshaft.", image: CDN + "timing_belt_chain.jpg" },
+{ id: 20, term: "Flywheel", phonetics: "/ˈflaɪwiːl/", category: "engine", indonesian: "Roda Gila / Flywheel", function: "Stores rotational energy to keep engine turning smoothly.", image: CDN + "flywheel.jpg" },
+{ id: 21, term: "Oil Pump", phonetics: "/ɔɪl pʌmp/", category: "engine", indonesian: "Pompa Oli", function: "Circulates engine oil under pressure to lubricate moving parts.", image: CDN + "oilpump.jpg" },
+{ id: 22, term: "Radiator", phonetics: "/ˈreɪdieɪtə/", category: "engine", indonesian: "Radiator", function: "Cools engine coolant liquid by dissipating heat to surrounding air.", image: CDN + "radiator.jpg" },
+{ id: 23, term: "Thermostat", phonetics: "/ˈθɜːməstæt/", category: "engine", indonesian: "Termostat", function: "Regulates coolant flow to maintain ideal engine temperature.", image: CDN + "thermostat.jpg" },
+{ id: 24, term: "Turbocharger", phonetics: "/ˈtɜːbəʊˌtʃɑːdʒə/", category: "engine", indonesian: "Turbocharger", function: "Forces extra compressed air into engine for higher power output.", image: CDN + "turbo.jpg" },
+{ id: 25, term: "Brake Pad", phonetics: "/breɪk pæd/", category: "brake", indonesian: "Kampas Rem Cakram", function: "Creates friction against brake rotor to slow or stop the vehicle.", image: CDN + "brake_pad_cakram.jpg" },
+{ id: 26, term: "Brake Rotor / Disc", phonetics: "/breɪk ˈrəʊtə/", category: "brake", indonesian: "Piringan Rem / Cakram", function: "Rotates with the wheel and is squeezed by brake pads to slow down.", image: CDN + "brake_rotor.jpg" },
+{ id: 27, term: "Brake Caliper", phonetics: "/breɪk ˈkælɪpə/", category: "brake", indonesian: "Kaliper Rem", function: "Houses brake pads and hydraulic pistons to press against the rotor.", image: CDN + "brake_caliper.jpg" },
+{ id: 28, term: "Drum Brake", phonetics: "/drʌm breɪk/", category: "brake", indonesian: "Rem Tromol", function: "Uses internal brake shoes pressing outward against a rotating drum.", image: CDN + "brake-drum.jpg" },
+{ id: 29, term: "Master Cylinder", phonetics: "/ˈmɑːstə ˈsɪlɪndə/", category: "brake", indonesian: "Master Rem Top", function: "Converts foot pedal pressure into hydraulic brake pressure.", image: CDN + "master_cylinderr.jpg" },
+{ id: 30, term: "ABS Module", phonetics: "/eɪ biː es ˈmɒdjuːl/", category: "brake", indonesian: "Modul ABS", function: "Prevents wheel lockup during hard braking to maintain steering control.", image: CDN + "abs_module.jpg" },
+{ id: 31, term: "Shock Absorber", phonetics: "/ʃɒk əbˈzɔːbə/", category: "chassis", indonesian: "Sokbreker / Peredam Kejut", function: "Dampens suspension bounce and road impacts for smooth ride.", image: CDN + "shock.jpg" },
+{ id: 32, term: "Coil Spring", phonetics: "/kɔɪl sprɪŋ/", category: "chassis", indonesian: "Per Ulir / Per Keong", function: "Supports vehicle weight and absorbs road shocks.", image: CDN + "spring.jpg" },
+{ id: 33, term: "Leaf Spring", phonetics: "/liːf sprɪŋ/", category: "chassis", indonesian: "Per Daun", function: "Heavy-duty layered spring used commonly in commercial trucks.", image: CDN + "leaf_spring.jpg" },
+{ id: 34, term: "Tie Rod End", phonetics: "/taɪ rɒd end/", category: "chassis", indonesian: "Tie Rod End", function: "Transfers steering force from steering gear to steering knuckles.", image: CDN + "tierodend.jpg" },
+{ id: 35, term: "Drive Shaft / Axle", phonetics: "/draɪv ʃɑːft/", category: "chassis", indonesian: "As Roda / Poros Penggerak", function: "Transfers torque from transmission or differential to driven wheels.", image: CDN + "drive_shaft.jpg" },
+{ id: 36, term: "Clutch Plate", phonetics: "/klʌtʃ pleɪt/", category: "chassis", indonesian: "Kampas Kopling", function: "Engages and disengages power transmission between engine and gearbox.", image: CDN + "Clutch_plate.jpg" },
+{ id: 37, term: "Differential", phonetics: "/ˌdɪfəˈrenʃl/", category: "chassis", indonesian: "Gardan", function: "Allows outer driven wheel to rotate faster than inner wheel during turns.", image: CDN + "differential.jpg" },
+{ id: 38, term: "Steering Gearbox", phonetics: "/ˈstɪərɪŋ ˈɡɪəbɒks/", category: "chassis", indonesian: "Steering Rack / Gearbox", function: "Converts rotational movement of steering wheel into directional wheel turn.", image: CDN + "steer_gb.jpg" },
+{ id: 39, term: "Battery", phonetics: "/ˈbætəri/", category: "electrical", indonesian: "Aki / Baterai Mobil", function: "Provides electrical current to power starter motor and electronic accessories.", image: CDN + "battery.jpg" },
+{ id: 40, term: "Alternator", phonetics: "/ˈɔːltəneɪtə/", category: "electrical", indonesian: "Alternator / Dinamo Isi", function: "Generates electricity while engine runs to recharge battery and power electricals.", image: CDN + "alternatore.jpg" },
+{ id: 41, term: "Starter Motor", phonetics: "/ˈstɑːtə ˈməʊtə/", category: "electrical", indonesian: "Dinamo Starter", function: "Cranks engine to initiate internal combustion process.", image: CDN + "starter.jpg" },
+{ id: 42, term: "Spark Plug", phonetics: "/spɑːk plʌɡ/", category: "electrical", indonesian: "Busi", function: "Ignites compressed air-fuel mixture inside petrol engines.", image: CDN + "spark_plug.jpg" },
+{ id: 43, term: "Ignition Coil", phonetics: "/ɪɡˈnɪʃn kɔɪl/", category: "electrical", indonesian: "Koil Pengapian", function: "Transforms low battery voltage to thousands of volts to spark the plug.", image: CDN + "ignition_coil.jpg" },
+{ id: 44, term: "ECU (Engine Control Unit)", phonetics: "/iː-siː-juː/", category: "electrical", indonesian: "ECU / Komputer Mobil", function: "Controls fuel injection timing, ignition, and engine parameters electronically.", image: CDN + "ECU.jpg" },
+{ id: 45, term: "Fuse Box", phonetics: "/fjuːz bɒks/", category: "electrical", indonesian: "Kotak Sekring", function: "Contains protective fuses to prevent electrical short-circuit damage.", image: CDN + "FUSE_BOX.jpg" },
+{ id: 46, term: "Fuel Injector", phonetics: "/ˈfjuːəl ɪnˈdʒektə/", category: "electrical", indonesian: "Injektor Bahan Bakar", function: "Sprays atomized fuel precisely into engine cylinder intake.", image: CDN + "injector.jpg" },
+{ id: 47, term: "Relay", phonetics: "/ˈriːleɪ/", category: "electrical", indonesian: "Relai Listrik", function: "Electrically operated switch to safely control high-current circuits.", image: CDN + "relays.jpg" },
+{ id: 48, term: "Hood / Bonnet", phonetics: "/hʊd / ˈbɒnɪt/", category: "body", indonesian: "Kap Mesin", function: "Hinged cover over the front engine compartment.", image: CDN + "hood.jpg" },
+{ id: 49, term: "Fender", phonetics: "/ˈfendə/", category: "body", indonesian: "Fender / Spakbor", function: "Body panel framing the wheel well to block road debris and water.", image: CDN + "fender.jpg" },
+{ id: 50, term: "Bumper", phonetics: "/ˈbʌmpə/", category: "body", indonesian: "Bumper", function: "Structure attached to front and rear to absorb low-speed impact energy.", image: CDN + "bumper.jpg" },
+{ id: 51, term: "Windshield", phonetics: "/ˈwɪndʃiːld/", category: "body", indonesian: "Kaca Depan Mobil", function: "Front window shielding occupants from wind and airborne objects.", image: CDN + "windshielde.jpg" },
+{ id: 52, term: "Side Mirror", phonetics: "/saɪd ˈmɪrə/", category: "body", indonesian: "Kaca Spion", function: "Adjustable outer mirror allowing drivers to see rear blind spots.", image: CDN + "side_mirror.jpg" },
+{ id: 53, term: "Tail Light Assembly", phonetics: "/teɪl laɪt/", category: "body", indonesian: "Lampu Belakang / Stop Lamp", function: "Rear lights indicating braking, reversing, and vehicle presence.", image: CDN + "tail_light.jpg" },
+{ id: 54, term: "Grille", phonetics: "/ɡrɪl/", category: "body", indonesian: "Grill Depan", function: "Front opening allowing air to reach radiator while protecting engine compartment.", image: CDN + "grille.jpg" }
+];
+const categories = [
+{ id: "all", label: "ALL PARTS", icon: "fa-list-check" },
+{ id: "tools", label: "TOOLS", icon: "fa-wrench" },
+{ id: "engine", label: "ENGINE", icon: "fa-gears" },
+{ id: "chassis", label: "CHASSIS", icon: "fa-truck-monster" },
+{ id: "brake", label: "BRAKE SYSTEM", icon: "fa-circle-dot" },
+{ id: "electrical", label: "ELECTRICAL", icon: "fa-bolt" },
+{ id: "body", label: "BODY", icon: "fa-car-side" }
+];
+let activeCategory = "all";
+function renderCategoryButtons() {
+const container = document.getElementById('categoryFilters');
+container.innerHTML = categories.map(cat => `<button onclick="setCategory('${cat.id}')" class="px-5 py-2.5 rounded-lg text-xs sm:text-sm font-black whitespace-nowrap flex items-center space-x-2 transition-all font-racing uppercase tracking-wider border-2 ${activeCategory === cat.id? 'bg-gradient-to-r from-amber-500 to-orange-600 text-black border-amber-400 shadow-[0_0_15px_rgba(251,146,60,0.5)] scale-105' : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:border-amber-500/50 hover:text-amber-400'}"><i class="fa-solid ${cat.icon}"></i><span>${cat.label}</span></button>`).join('');
+}
+function setCategory(catId) { activeCategory = catId; renderCategoryButtons(); filterData(); }
+function filterData() {
+const query = document.getElementById('searchInput').value.toLowerCase().trim();
+const filtered = automotiveData.filter(item => {
+const matchesCategory = activeCategory === 'all' || item.category === activeCategory;
+const matchesQuery = item.term.toLowerCase().includes(query) || item.indonesian.toLowerCase().includes(query) || item.function.toLowerCase().includes(query);
+return matchesCategory && matchesQuery;
+});
+renderGrid(filtered);
+}
+function renderGrid(items) {
+const grid = document.getElementById('dictionaryGrid');
+const emptyState = document.getElementById('emptyState');
+const countLabel = document.getElementById('resultsCount');
+countLabel.textContent = `GARAGE: ${items.length} PARTS READY`;
+if (items.length === 0) { grid.innerHTML = ''; emptyState.classList.remove('hidden'); return; }
+emptyState.classList.add('hidden');
+grid.innerHTML = items.map(item => `<div class="card-hover bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-2xl border border-zinc-800 hover:border-amber-500/50 overflow-hidden flex flex-col justify-between p-5 transition-all duration-300 group"><div><div class="flex justify-between items-start mb-4"><span class="text-[10px] uppercase tracking-widest font-black px-3 py-1.5 rounded-md ${getCategoryBadgeColor(item.category)} border font-racing">${item.category.toUpperCase()}</span><button onclick="speakText('${item.term}')" class="w-10 h-10 bg-amber-500 hover:bg-orange-500 text-black rounded-full flex items-center justify-center transition-all shadow-[0_0_10px_rgba(251,146,60,0.4)] active:scale-90"><i class="fa-solid fa-volume-high text-sm"></i></button></div><div class="relative bg-white rounded-xl mb-4 overflow-hidden border-2 border-zinc-800 group-hover:border-amber-500/30 transition"><div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 to-orange-600"></div><img src="${item.image}" alt="${item.term}" class="w-full h-44 object-contain p-3 bg-white" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200/111111/FFA500?text='+encodeURIComponent(item.term)"><div class="absolute bottom-1 right-1 text-[8px] bg-black text-amber-500 px-1.5 py-0.5 rounded font-black uppercase">SMKN WONGSOREJO</div></div><h3 class="text-lg font-black text-white leading-snug font-racing uppercase italic group-hover:text-amber-400 transition">${item.term}</h3><p class="text-xs font-mono text-zinc-500 mt-1 mb-2">${item.phonetics}</p><div class="inline-flex items-center bg-zinc-800 text-amber-400 text-xs font-bold px-3 py-1.5 rounded-full mb-3 border border-zinc-700"><i class="fa-solid fa-language mr-2"></i> ${item.indonesian}</div><p class="text-xs text-zinc-400 leading-relaxed bg-black/50 p-3 rounded-xl border border-zinc-800/50"><strong class="text-amber-500 font-black block mb-1 uppercase text-[11px] tracking-wider"><i class="fa-solid fa-gears mr-1"></i> Function:</strong>${item.function}</p></div><div class="mt-4 flex justify-between items-center"><div class="h-1 flex-1 bg-zinc-800 rounded-full overflow-hidden mr-3"><div class="h-full bg-gradient-to-r from-amber-500 to-orange-600 w-[70%]"></div></div><span class="text-[9px] font-black text-zinc-600 uppercase tracking-widest">TKRO</span></div></div>`).join('');
+}
+function getCategoryBadgeColor(category) {
+switch(category) {
+case 'tools': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+case 'engine': return 'bg-red-500/20 text-red-400 border-red-500/30';
+case 'chassis': return 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+case 'brake': return 'bg-purple-500/20 text-purple-400 border-purple-500/30';
+case 'electrical': return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+case 'body': return 'bg-sky-500/20 text-sky-400 border-sky-500/30';
+default: return 'bg-zinc-700 text-zinc-300 border-zinc-600';
+}
+}
+function speakText(text) {
+if ('speechSynthesis' in window) {
+window.speechSynthesis.cancel();
+const utterance = new SpeechSynthesisUtterance(text);
+utterance.lang = 'en-US';
+utterance.rate = 0.85;
+window.speechSynthesis.speak(utterance);
+}
+}
+document.addEventListener('DOMContentLoaded', () => { renderCategoryButtons(); filterData(); });
+</script>
+</body>
+</html>
